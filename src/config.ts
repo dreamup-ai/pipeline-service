@@ -15,12 +15,14 @@ const {
   WEBHOOK_SIG_HEADER = "x-dreamup-signature",
   DREAMUP_SESSION_COOKIE_NAME = "dreamup_session",
   SESSION_PUBLIC_KEY_URL,
+  SESSION_LOGIN_URL,
 } = process.env;
 
 assert(PIPELINE_TABLE, "PIPELINE_TABLE is required");
 assert(WEBHOOK_PUBLIC_KEY_PATH, "WEBHOOK_PUBLIC_KEY_PATH is required");
 assert(WEBHOOK_PRIVATE_KEY_PATH, "WEBHOOK_PRIVATE_KEY_PATH is required");
 assert(SESSION_PUBLIC_KEY_URL, "SESSION_PUBLIC_KEY_URL is required");
+assert(SESSION_LOGIN_URL, "SESSION_LOGIN_URL is required");
 
 const rawWebhookPublicKey = fs.readFileSync(WEBHOOK_PUBLIC_KEY_PATH, "utf8");
 const webhookPublicKey = crypto.createPublicKey(rawWebhookPublicKey);
@@ -53,6 +55,7 @@ type config = {
   session: {
     publicKey: () => Promise<crypto.KeyObject>;
     cookieName: string;
+    loginUrl: string;
   };
 };
 
@@ -90,6 +93,7 @@ const config: config = {
       return sessionKey;
     },
     cookieName: DREAMUP_SESSION_COOKIE_NAME,
+    loginUrl: SESSION_LOGIN_URL,
   },
 };
 
