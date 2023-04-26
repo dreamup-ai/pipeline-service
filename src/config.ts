@@ -93,4 +93,25 @@ const config: config = {
   },
 };
 
+const pipelineCreateHooks = Object.keys(process.env)
+  .filter((x) => x.startsWith("WEBHOOK_PIPELINE_CREATE") && process.env[x])
+  .map((x) => process.env[x]) as string[];
+if (pipelineCreateHooks.length > 0) {
+  config.webhooks.events["pipeline.create"] = pipelineCreateHooks;
+}
+
+const pipelineUpdateHooks = Object.keys(process.env)
+  .filter((x) => x.startsWith("WEBHOOK_PIPELINE_UPDATE") && process.env[x])
+  .map((x) => process.env[x]) as string[];
+if (pipelineUpdateHooks.length > 0) {
+  config.webhooks.events["pipeline.update"] = pipelineUpdateHooks;
+}
+
+const pipelineDeleteHooks = Object.keys(process.env)
+  .filter((x) => x.startsWith("WEBHOOK_PIPELINE_DELETE") && process.env[x])
+  .map((x) => process.env[x]) as string[];
+if (pipelineDeleteHooks.length > 0) {
+  config.webhooks.events["pipeline.delete"] = pipelineDeleteHooks;
+}
+
 export default config;

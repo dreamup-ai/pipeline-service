@@ -3,9 +3,11 @@ import { FromSchema, JSONSchema7 } from "json-schema-to-ts";
 export const pipelineSchema = {
   type: "object",
   properties: {
-    id: { type: "string" },
-    model_type: {
+    id: { type: "string", description: "The ID of the pipeline" },
+    name: { type: "string", description: "The friendly name of the pipeline" },
+    description: {
       type: "string",
+      description: "A description of the pipeline",
     },
     input_schema: {
       type: "object",
