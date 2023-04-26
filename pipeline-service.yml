@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  user-service:
+    container_name: dreamup-pipeline-service
+    image: dreamup-user-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    env_file:
+      - .env.local
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3001
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+    volumes:
+      # There's a bunch of keys in the fixtures folder that we need to use
+      - type: bind
+        source: ./test/fixtures
+        target: /app/test/fixtures
+        read_only: true
+    
