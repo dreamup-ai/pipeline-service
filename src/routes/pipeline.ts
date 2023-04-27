@@ -12,11 +12,13 @@ import {
   ErrorResponse,
   IdParam,
   Pipeline,
+  PipelineUpdate,
   SignatureHeader,
   deletedResponseSchema,
   errorResponseSchema,
   idParamSchema,
   pipelineSchema,
+  pipelineUpdateSchema,
   signatureHeaderSchema,
 } from "../types";
 import {
@@ -24,9 +26,7 @@ import {
   dreamupUserSession,
   either,
 } from "../middleware/audiences";
-import Ajv from "ajv";
-
-const ajv = new Ajv();
+import { validateSchema } from "../middleware/validate-schema";
 
 const routes = (fastify: FastifyInstance, _: any, done: Function) => {
   fastify.post<{
@@ -46,23 +46,9 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
           500: errorResponseSchema,
         },
       },
-      preValidation: [dreamupInternal],
+      preValidation: [dreamupInternal, validateSchema],
     },
     async (request, reply) => {
-      try {
-        ajv.compile(request.body.input_schema);
-      } catch (e: any) {
-        reply
-          .code(400)
-          .send({ error: "input_schema must be a valid JSON Schema v7" });
-      }
-      try {
-        ajv.compile(request.body.output_schema);
-      } catch (e: any) {
-        reply
-          .code(400)
-          .send({ error: "output_schema must be a valid JSON Schema v7" });
-      }
       const pipeline = await createPipeline(request.body, fastify.log);
       if (!pipeline) {
         reply.code(409).send({ error: "Pipeline already exists" });
@@ -156,7 +142,7 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
 
   fastify.put<{
     Params: IdParam;
-    Body: Pipeline;
+    Body: PipelineUpdate;
     Headers: SignatureHeader;
     Response: Pipeline | ErrorResponse;
   }>(
@@ -164,7 +150,7 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
     {
       schema: {
         params: idParamSchema,
-        body: pipelineSchema,
+        body: pipelineUpdateSchema,
         headers: signatureHeaderSchema,
         response: {
           200: pipelineSchema,
@@ -173,7 +159,7 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
           500: errorResponseSchema,
         },
       },
-      preValidation: [dreamupInternal],
+      preValidation: [dreamupInternal, validateSchema],
     },
     async (request, reply) => {
       const pipeline = await updatePipelineById(

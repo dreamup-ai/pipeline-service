@@ -4,7 +4,7 @@ import { FastifyInstance } from "fastify";
 import config from "../../../src/config";
 import { createPipeline } from "../../../src/crud";
 
-describe.only("POST /pipeline", () => {
+describe("POST /pipeline", () => {
   let server: FastifyInstance;
 
   before(async () => {

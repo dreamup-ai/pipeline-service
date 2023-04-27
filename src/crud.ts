@@ -8,7 +8,7 @@ import {
 import config from "./config";
 import { v4 as uuid4 } from "uuid";
 import { Item } from "dynamo-tools";
-import { Pipeline } from "./types";
+import { Pipeline, PipelineUpdate } from "./types";
 import { sendWebhook } from "./webhooks";
 import { FastifyBaseLogger } from "fastify";
 
@@ -154,7 +154,7 @@ export const getUpdateExpressionForArbitrarilyNestedUpdate = (data: any) => {
 
 export const updatePipelineById = async (
   id: string,
-  data: Pipeline,
+  data: PipelineUpdate,
   log: FastifyBaseLogger
 ) => {
   const updateParams = {

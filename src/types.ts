@@ -25,6 +25,13 @@ export const pipelineSchema = {
 
 export type Pipeline = FromSchema<typeof pipelineSchema>;
 
+export const pipelineUpdateSchema = {
+  ...pipelineSchema,
+  required: [],
+};
+
+export type PipelineUpdate = FromSchema<typeof pipelineUpdateSchema>;
+
 export const deletedResponseSchema = {
   type: "object",
   properties: {

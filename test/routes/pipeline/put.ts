@@ -1,9 +1,13 @@
 import { expect } from "chai";
-import { clearTable, getServer } from "../../util";
+import { clearTable, getServer, sign } from "../../util";
 import { FastifyInstance } from "fastify";
+import config from "../../../src/config";
+import { createPipeline } from "../../../src/crud";
+import { Pipeline } from "../../../src/types";
 
 describe("PUT /pipeline/:id", () => {
   let server: FastifyInstance;
+  let pipeline: Pipeline;
 
   before(async () => {
     server = await getServer();
@@ -11,9 +15,49 @@ describe("PUT /pipeline/:id", () => {
 
   beforeEach(async () => {
     await clearTable();
+    pipeline = (await createPipeline(
+      {
+        id: "test-pipeline",
+        name: "Test Pipeline",
+        description: "A test pipeline",
+        input_schema: {
+          type: "object",
+          properties: {
+            test: {
+              type: "string",
+            },
+          },
+        },
+        output_schema: {
+          type: "object",
+          properties: {
+            test: {
+              type: "string",
+            },
+          },
+        },
+      },
+      server.log
+    )) as Pipeline;
   });
 
-  it("returns 200 for a valid pipeline correctly authenticated", async () => {});
+  it("returns 200 for a valid pipeline correctly authenticated", async () => {
+    const update = {
+      description: "A test pipeline, updated",
+    };
+
+    const response = await server.inject({
+      method: "PUT",
+      url: `/pipeline/${pipeline.id}`,
+      headers: {
+        [config.webhooks.signatureHeader]: sign(JSON.stringify(update)),
+      },
+      payload: update,
+    });
+
+    expect(response.statusCode).to.equal(200);
+    expect(response.json()).to.deep.equal({ ...pipeline, ...update });
+  });
 
   it("returns 400 if the request is unsigned", async () => {});
 
