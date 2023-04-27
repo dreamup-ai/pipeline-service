@@ -16,7 +16,7 @@ const dynamo = new DynamoDBClient({
 export const deleteTable = async () => {
   await dynamo.send(
     new DeleteTableCommand({
-      TableName: config.db.userTable,
+      TableName: config.db.pipelineTable,
     })
   );
 };
@@ -25,7 +25,7 @@ export const createTable = async () => {
   try {
     await dynamo.send(
       new CreateTableCommand({
-        TableName: config.db.userTable,
+        TableName: config.db.pipelineTable,
         AttributeDefinitions: [
           {
             AttributeName: "id",
