@@ -31,77 +31,11 @@ export const createTable = async () => {
             AttributeName: "id",
             AttributeType: "S",
           },
-          {
-            AttributeName: "email",
-            AttributeType: "S",
-          },
-          {
-            AttributeName: "idp:cognito:id",
-            AttributeType: "S",
-          },
-          {
-            AttributeName: "idp:google:id",
-            AttributeType: "S",
-          },
-          {
-            AttributeName: "idp:discord:id",
-            AttributeType: "S",
-          },
         ],
         KeySchema: [
           {
             AttributeName: "id",
             KeyType: "HASH",
-          },
-        ],
-        GlobalSecondaryIndexes: [
-          {
-            IndexName: "email",
-            KeySchema: [
-              {
-                AttributeName: "email",
-                KeyType: "HASH",
-              },
-            ],
-            Projection: {
-              ProjectionType: "ALL",
-            },
-          },
-          {
-            IndexName: "cognito_id",
-            KeySchema: [
-              {
-                AttributeName: "idp:cognito:id",
-                KeyType: "HASH",
-              },
-            ],
-            Projection: {
-              ProjectionType: "ALL",
-            },
-          },
-          {
-            IndexName: "google_id",
-            KeySchema: [
-              {
-                AttributeName: "idp:google:id",
-                KeyType: "HASH",
-              },
-            ],
-            Projection: {
-              ProjectionType: "ALL",
-            },
-          },
-          {
-            IndexName: "discord_id",
-            KeySchema: [
-              {
-                AttributeName: "idp:discord:id",
-                KeyType: "HASH",
-              },
-            ],
-            Projection: {
-              ProjectionType: "ALL",
-            },
           },
         ],
         BillingMode: "PAY_PER_REQUEST",
