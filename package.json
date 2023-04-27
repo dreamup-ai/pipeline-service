@@ -7,8 +7,9 @@
     "test": "npm run build && APP_ENV=test mocha --require dist/test/env.js --recursive dist/test",
     "build": "tsc",
     "start": "APP_ENV=local node dist/src/index.js",
-    "init-local": "docker compose -f dependencies.yml up --detach && APP_ENV=local npx run-func dist/init-local-dynamo.js createTable",
-    "compose": "./scripts/run"
+    "init-local": "docker compose -f test-dependencies.yml up --detach && APP_ENV=local npx run-func dist/init-local-dynamo.js createTable",
+    "compose-up": "./scripts/run",
+    "compose-down": "./scripts/down"
   },
   "repository": {
     "type": "git",

@@ -2,6 +2,7 @@ import { FromSchema, JSONSchema7 } from "json-schema-to-ts";
 
 export const pipelineSchema = {
   type: "object",
+  required: ["name", "description", "input_schema", "output_schema"],
   properties: {
     id: { type: "string", description: "The ID of the pipeline" },
     name: { type: "string", description: "The friendly name of the pipeline" },
@@ -12,10 +13,12 @@ export const pipelineSchema = {
     input_schema: {
       type: "object",
       description: "A JSON Schema describing the input to the pipeline",
+      additionalProperties: true,
     },
     output_schema: {
       type: "object",
       description: "A JSON Schema describing the output of the pipeline",
+      additionalProperties: true,
     },
   },
 } as const satisfies JSONSchema7;

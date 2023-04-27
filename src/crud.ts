@@ -86,7 +86,7 @@ export const createPipeline = async (
     sendWebhook("pipeline.created", pipeline, log);
     return pipeline;
   } catch (e: any) {
-    if (e.code === "ConditionalCheckFailedException") {
+    if (e.name === "ConditionalCheckFailedException") {
       return null;
     }
     throw e;
@@ -174,7 +174,7 @@ export const updatePipelineById = async (
     sendWebhook("pipeline.updated", pipeline, log);
     return pipeline;
   } catch (e: any) {
-    if (e.code === "ConditionalCheckFailedException") {
+    if (e.name === "ConditionalCheckFailedException") {
       return null;
     }
     throw e;
@@ -199,7 +199,7 @@ export const deletePipelineById = async (
     sendWebhook("pipeline.deleted", pipeline, log);
     return pipeline;
   } catch (e: any) {
-    if (e.code === "ConditionalCheckFailedException") {
+    if (e.name === "ConditionalCheckFailedException") {
       return null;
     }
     throw e;

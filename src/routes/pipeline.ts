@@ -8,22 +8,25 @@ import {
   getPipelineOutputSchemaById,
 } from "../crud";
 import {
+  DeletedResponse,
   ErrorResponse,
+  IdParam,
   Pipeline,
+  SignatureHeader,
   deletedResponseSchema,
+  errorResponseSchema,
+  idParamSchema,
   pipelineSchema,
+  signatureHeaderSchema,
 } from "../types";
 import {
   dreamupInternal,
   dreamupUserSession,
   either,
 } from "../middleware/audiences";
-import { signatureHeaderSchema } from "../types";
-import { errorResponseSchema } from "../types";
-import { SignatureHeader } from "../types";
-import { IdParam } from "../types";
-import { idParamSchema } from "../types";
-import { DeletedResponse } from "../types";
+import Ajv from "ajv";
+
+const ajv = new Ajv();
 
 const routes = (fastify: FastifyInstance, _: any, done: Function) => {
   fastify.post<{
@@ -46,6 +49,20 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
       preValidation: [dreamupInternal],
     },
     async (request, reply) => {
+      try {
+        ajv.compile(request.body.input_schema);
+      } catch (e: any) {
+        reply
+          .code(400)
+          .send({ error: "input_schema must be a valid JSON Schema v7" });
+      }
+      try {
+        ajv.compile(request.body.output_schema);
+      } catch (e: any) {
+        reply
+          .code(400)
+          .send({ error: "output_schema must be a valid JSON Schema v7" });
+      }
       const pipeline = await createPipeline(request.body, fastify.log);
       if (!pipeline) {
         reply.code(409).send({ error: "Pipeline already exists" });
