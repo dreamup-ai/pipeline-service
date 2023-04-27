@@ -118,4 +118,6 @@ if (pipelineDeleteHooks.length > 0) {
   config.webhooks.events["pipeline.delete"] = pipelineDeleteHooks;
 }
 
+// config.session.publicKey();
+
 export default config;

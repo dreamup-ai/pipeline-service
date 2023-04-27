@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { clearTable, getServer, sign } from "../../util";
 import { FastifyInstance } from "fastify";
 import config from "../../../src/config";
-import { createPipeline } from "../../../src/crud";
+import { createPipeline, deletePipelineById } from "../../../src/crud";
 import { Pipeline } from "../../../src/types";
 
 describe("PUT /pipeline/:id", () => {
@@ -59,13 +59,100 @@ describe("PUT /pipeline/:id", () => {
     expect(response.json()).to.deep.equal({ ...pipeline, ...update });
   });
 
-  it("returns 400 if the request is unsigned", async () => {});
+  it("returns 400 if the request is unsigned", async () => {
+    const update = {
+      description: "A test pipeline, updated",
+    };
 
-  it("returns 400 if the body is missing required fields", async () => {});
+    const response = await server.inject({
+      method: "PUT",
+      url: `/pipeline/${pipeline.id}`,
+      payload: update,
+    });
 
-  it("returns 400 if the body contains invalid fields", async () => {});
+    expect(response.statusCode).to.equal(400);
+    expect(response.json()).to.deep.equal({
+      error: "Missing signature",
+    });
+  });
 
-  it("returns 401 if the signature is invalid", async () => {});
+  it("returns 400 if the body is missing required fields", async () => {
+    const update = {};
 
-  it("returns 404 if the pipeline does not exist", async () => {});
+    const response = await server.inject({
+      method: "PUT",
+      url: `/pipeline/${pipeline.id}`,
+      headers: {
+        [config.webhooks.signatureHeader]: sign(JSON.stringify(update)),
+      },
+      payload: update,
+    });
+
+    expect(response.statusCode).to.equal(400);
+    expect(response.json()).to.deep.equal({
+      error: "Body must include at least one field to update",
+    });
+  });
+
+  it("ignores invalid fields", async () => {
+    const update = {
+      invalid: "field",
+    };
+
+    const response = await server.inject({
+      method: "PUT",
+      url: `/pipeline/${pipeline.id}`,
+      headers: {
+        [config.webhooks.signatureHeader]: sign(JSON.stringify(update)),
+      },
+      payload: update,
+    });
+
+    expect(response.statusCode).to.equal(400);
+    expect(response.json()).to.deep.equal({
+      error: "Body must include at least one field to update",
+    });
+  });
+
+  it("returns 401 if the signature is invalid", async () => {
+    const update = {
+      description: "A test pipeline, updated",
+    };
+
+    const response = await server.inject({
+      method: "PUT",
+      url: `/pipeline/${pipeline.id}`,
+      headers: {
+        [config.webhooks.signatureHeader]: "invalid",
+      },
+      payload: update,
+    });
+
+    expect(response.statusCode).to.equal(401);
+    expect(response.json()).to.deep.equal({
+      error: "Invalid signature",
+    });
+  });
+
+  it("returns 404 if the pipeline does not exist", async () => {
+    await deletePipelineById(pipeline.id!, server.log);
+
+    const update = {
+      description: "A test pipeline, updated",
+    };
+
+    const response = await server.inject({
+      method: "PUT",
+      url: `/pipeline/${pipeline.id}`,
+      headers: {
+        [config.webhooks.signatureHeader]: sign(JSON.stringify(update)),
+      },
+      payload: update,
+    });
+
+    expect(response.statusCode).to.equal(404);
+    expect(response.json()).to.deep.equal({
+      error: "Pipeline not found",
+    });
+  });
 });

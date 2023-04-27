@@ -21,6 +21,7 @@ export const pipelineSchema = {
       additionalProperties: true,
     },
   },
+  additionalProperties: false,
 } as const satisfies JSONSchema7;
 
 export type Pipeline = FromSchema<typeof pipelineSchema>;

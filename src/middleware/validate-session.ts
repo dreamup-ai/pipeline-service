@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { KeyObject } from "node:crypto";
 import config from "../config";
 import jwt from "jsonwebtoken";
 
@@ -12,58 +11,59 @@ declare module "fastify" {
   }
 }
 
-export const makeSessionValidator = (publicKey: KeyObject) => {
-  return async function sourceValidator(
-    req: FastifyRequest,
-    reply: FastifyReply
-  ) {
-    // Auth token can be in a cookie, or in the Authorization header as a bearer token
-    const { authorization } = req.headers;
+export const sessionValidator = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const publicKey = await config.session.publicKey();
+  // Auth token can be in a cookie, or in the Authorization header as a bearer token
+  const { authorization } = req.headers;
 
-    // We set a cookie with what idp the user last signed in with.
-    // We use this to redirect a user to the correct login flow
+  // We set a cookie with what idp the user last signed in with.
+  // We use this to redirect a user to the correct login flow
 
-    let token: string;
-    let code: number = 302;
-    if (authorization) {
-      // If the user is using the API, we don't want to redirect them to the login page
-      code = 401;
-      const [authType, authToken] = authorization?.split(" ") ?? [null, null];
-      if (authType.toLowerCase() !== "bearer") {
-        return reply.status(code).send({ error: "Invalid authorization type" });
-      }
-      token = authToken;
-    } else {
-      const { [config.session.cookieName]: cookieToken } = req.cookies;
-      if (!cookieToken) {
-        return reply.redirect(
-          code,
-          `${config.session.loginUrl}?redirect=${req.url}`
-        );
-      }
-      token = cookieToken;
+  let token: string;
+  let code: number = 302;
+  if (authorization) {
+    // If the user is using the API, we don't want to redirect them to the login page
+    code = 401;
+    const [authType, authToken] = authorization?.split(" ") ?? [null, null];
+    if (authType.toLowerCase() !== "bearer") {
+      throw { code, error: "Invalid authorization type", continue: true };
     }
-
-    // Token must be valid
-    try {
-      const decoded = jwt.verify(token, publicKey, {
-        algorithms: ["RS256"],
-      }) as jwt.JwtPayload;
-      const { userId, sessionId } = decoded as {
-        userId: string;
-        sessionId: string;
-      };
-
-      // Set the user ID and session ID on the request
-      req.user = { userId, sessionId };
-    } catch (e: any) {
-      if (code === 401) {
-        return reply.status(code).send({ error: e.message });
-      }
-      return reply.redirect(
+    token = authToken;
+  } else {
+    const { [config.session.cookieName]: cookieToken } = req.cookies;
+    if (!cookieToken) {
+      throw {
         code,
-        `${config.session.loginUrl}?redirect=${req.url}`
-      );
+        redirect: `${config.session.loginUrl}?redirect=${req.url}`,
+        continue: true,
+      };
     }
-  };
+    token = cookieToken;
+  }
+
+  // Token must be valid
+  try {
+    const decoded = jwt.verify(token, publicKey, {
+      algorithms: ["RS256"],
+    }) as jwt.JwtPayload;
+    const { userId, sessionId } = decoded as {
+      userId: string;
+      sessionId: string;
+    };
+
+    // Set the user ID and session ID on the request
+    req.user = { userId, sessionId };
+  } catch (e: any) {
+    if (code === 401) {
+      throw { code, error: "Invalid authorization token", continue: false };
+    }
+    throw {
+      code,
+      redirect: `${config.session.loginUrl}?redirect=${req.url}`,
+      continue: false,
+    };
+  }
 };

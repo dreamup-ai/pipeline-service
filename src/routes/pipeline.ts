@@ -66,6 +66,7 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
     {
       schema: {
         params: idParamSchema,
+        headers: signatureHeaderSchema,
         response: {
           200: pipelineSchema,
           404: errorResponseSchema,
@@ -119,6 +120,7 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
     {
       schema: {
         params: idParamSchema,
+        headers: signatureHeaderSchema,
         response: {
           200: {
             type: "object",
@@ -162,6 +164,17 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
       preValidation: [dreamupInternal, validateSchema],
     },
     async (request, reply) => {
+      if (request.body.id && request.body.id !== request.params.id) {
+        reply.code(400).send({
+          error: `Cannot change pipeline ID from ${request.params.id} to ${request.body.id}`,
+        });
+      }
+
+      if (Object.keys(request.body).length === 0) {
+        reply.code(400).send({
+          error: "Body must include at least one field to update",
+        });
+      }
       const pipeline = await updatePipelineById(
         request.params.id,
         request.body,

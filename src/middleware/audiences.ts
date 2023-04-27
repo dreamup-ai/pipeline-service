@@ -1,5 +1,5 @@
 import config from "../config";
-import { makeSessionValidator } from "./validate-session";
+import { sessionValidator } from "./validate-session";
 import { makeSourceValidator } from "./validate-source";
 
 export const dreamupInternal = makeSourceValidator(
@@ -7,18 +7,18 @@ export const dreamupInternal = makeSourceValidator(
   config.webhooks.signatureHeader
 );
 
-export const dreamupUserSession = async () => {
-  const key = await config.session.publicKey();
-  return makeSessionValidator(key);
-};
+export { sessionValidator as dreamupUserSession };
 
-export const either =
-  (a: any, b: any) => (request: any, reply: any, done: any) => {
-    a(request, reply, (err: any) => {
-      if (err) {
-        b(request, reply, done);
-      } else {
-        done();
-      }
-    });
-  };
+export const either = (a: any, b: any) => async (request: any, reply: any) => {
+  try {
+    await a(request, reply);
+  } catch (e: any) {
+    if (e.continue) {
+      await b(request, reply);
+    } else if (e.redirect) {
+      reply.code(e.code).redirect(e.redirect);
+    } else {
+      reply.code(e.code).send({ error: e.error });
+    }
+  }
+};
