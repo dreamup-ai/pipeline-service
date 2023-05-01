@@ -19,9 +19,6 @@ export const sessionValidator = async (
   // Auth token can be in a cookie, or in the Authorization header as a bearer token
   const { authorization } = req.headers;
 
-  // We set a cookie with what idp the user last signed in with.
-  // We use this to redirect a user to the correct login flow
-
   let token: string;
   let code: number = 302;
   if (authorization) {

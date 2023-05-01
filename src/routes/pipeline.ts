@@ -96,6 +96,7 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
           200: {
             type: "object",
             description: "A JSON Schema describing the input to the pipeline",
+            additionalProperties: true,
           },
           404: errorResponseSchema,
         },
@@ -126,6 +127,7 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
             type: "object",
             description:
               "A JSON Schema describing the output from the pipeline",
+            additionalProperties: true,
           },
           404: errorResponseSchema,
         },
