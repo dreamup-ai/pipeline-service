@@ -57,7 +57,7 @@ describe("GET /pipeline/:id", () => {
     expect(response.json()).to.deep.equal(pipeline);
   });
 
-  it("returns 302 for an invalid user session in a cookie", async () => {
+  it("returns 307 for an invalid user session in a cookie", async () => {
     const response = await server.inject({
       method: "GET",
       url: `/pipeline/${pipeline.id}`,
@@ -66,7 +66,7 @@ describe("GET /pipeline/:id", () => {
       },
     });
 
-    expect(response.statusCode).to.equal(302);
+    expect(response.statusCode).to.equal(307);
     expect(response.headers.location).to.equal(
       `${config.session.loginUrl}?redirect=/pipeline/${pipeline.id}`
     );
@@ -186,7 +186,7 @@ describe("GET /pipeline/:id/input_schema", () => {
     expect(response.json()).to.deep.equal(pipeline.input_schema);
   });
 
-  it("returns 302 for an invalid user session in a cookie", async () => {
+  it("returns 307 for an invalid user session in a cookie", async () => {
     const response = await server.inject({
       method: "GET",
       url: `/pipeline/${pipeline.id}/input_schema`,
@@ -195,7 +195,7 @@ describe("GET /pipeline/:id/input_schema", () => {
       },
     });
 
-    expect(response.statusCode).to.equal(302);
+    expect(response.statusCode).to.equal(307);
     expect(response.headers.location).to.equal(
       `${config.session.loginUrl}?redirect=/pipeline/${pipeline.id}/input_schema`
     );
@@ -318,7 +318,7 @@ describe("GET /pipeline/:id/output_schema", () => {
     expect(response.json()).to.deep.equal(pipeline.output_schema);
   });
 
-  it("returns 302 for an invalid user session in a cookie", async () => {
+  it("returns 307 for an invalid user session in a cookie", async () => {
     const response = await server.inject({
       method: "GET",
       url: `/pipeline/${pipeline.id}/output_schema`,
@@ -327,7 +327,7 @@ describe("GET /pipeline/:id/output_schema", () => {
       },
     });
 
-    expect(response.statusCode).to.equal(302);
+    expect(response.statusCode).to.equal(307);
     expect(response.headers.location).to.equal(
       `${config.session.loginUrl}?redirect=/pipeline/${pipeline.id}/output_schema`
     );

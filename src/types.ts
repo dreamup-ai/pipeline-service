@@ -91,3 +91,17 @@ export const idParamSchema = {
 } as const satisfies JSONSchema7;
 
 export type IdParam = FromSchema<typeof idParamSchema>;
+
+export const validationSchema = {
+  type: "object",
+  properties: {
+    input: {
+      type: "array",
+    },
+    output: {
+      type: "array",
+    },
+  },
+} as const;
+
+export type Validation = FromSchema<typeof validationSchema>;

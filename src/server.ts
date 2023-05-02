@@ -6,6 +6,7 @@ import { JsonSchemaToTsProvider } from "@fastify/type-provider-json-schema-to-ts
 import cookie from "@fastify/cookie";
 import { pipelineSchema } from "./types";
 import pipelineRoutes from "./routes/pipeline";
+import validateRoutes from "./routes/validate";
 
 export const build = async (opts: FastifyServerOptions) => {
   const server = Fastify(opts).withTypeProvider<JsonSchemaToTsProvider>();
@@ -124,6 +125,7 @@ export const build = async (opts: FastifyServerOptions) => {
 
   server.register(cookie);
   server.register(pipelineRoutes);
+  server.register(validateRoutes);
   await server.ready();
   return server;
 };

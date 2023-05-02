@@ -92,6 +92,7 @@ const routes = (fastify: FastifyInstance, _: any, done: Function) => {
     {
       schema: {
         params: idParamSchema,
+        headers: signatureHeaderSchema,
         response: {
           200: {
             type: "object",

@@ -4,18 +4,20 @@ import crypto, { KeyObject } from "node:crypto";
 export const makeSourceValidator = (publicKey: KeyObject, header: string) => {
   return async function sourceValidator(
     req: FastifyRequest,
-    res: FastifyReply
+    reply: FastifyReply
   ) {
     const { [header]: signature } = req.headers;
     if (!signature) {
-      return res.status(400).send({
+      reply.status(400).send({
         error: "Missing signature",
       });
+      return;
     }
     if (Array.isArray(signature)) {
-      return res.status(400).send({
+      reply.status(400).send({
         error: "Only Include One Signature",
       });
+      return;
     }
     // Request must be valid
     const isVerified = crypto.verify(
@@ -27,9 +29,10 @@ export const makeSourceValidator = (publicKey: KeyObject, header: string) => {
       Buffer.from(signature, "base64")
     );
     if (!isVerified) {
-      return res.status(401).send({
+      reply.status(401).send({
         error: "Invalid signature",
       });
+      return;
     }
   };
 };

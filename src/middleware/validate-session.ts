@@ -20,7 +20,7 @@ export const sessionValidator = async (
   const { authorization } = req.headers;
 
   let token: string;
-  let code: number = 302;
+  let code: number = 307;
   if (authorization) {
     // If the user is using the API, we don't want to redirect them to the login page
     code = 401;
