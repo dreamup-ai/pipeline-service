@@ -1,8 +1,8 @@
-version: '3.9'
+version: "3.9"
 services:
-  user-service:
+  pipeline-service:
     container_name: dreamup-pipeline-service
-    image: dreamup-user-service
+    image: dreamup-pipeline-service
     build:
       context: .
       dockerfile: Dockerfile
@@ -20,4 +20,3 @@ services:
         source: ./test/fixtures
         target: /app/test/fixtures
         read_only: true
-    

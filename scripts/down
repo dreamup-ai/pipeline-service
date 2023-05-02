@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker compose -f test-dependencies.yml -f pipeline-service.yml down "$@"
+docker compose -f test-dependencies.yml -f user-service.yml -f pipeline-service.yml down "$@"
