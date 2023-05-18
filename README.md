@@ -30,7 +30,7 @@ The tests depend on the services defined in `test-dependencies.yml`, in this cas
 
 ```shell
 # Start DynamoDB Local
-docker compose up -f test-dependencies.yml --detach
+docker compose -f test-dependencies.yml up --detach
 
 # Run Tests
 npm test
